@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { AnalysisResult, UserInput } from '@/lib/types';
 import ScoreGauge from './ScoreGauge';
-import { ShieldAlert, ShieldCheck, Shield, ChevronRight, Download, RefreshCw, BrainCircuit, Target, Lightbulb, Building2 } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Shield, ChevronRight, Download, RefreshCw, BrainCircuit, Target, Lightbulb, Building2, Check, Copy } from 'lucide-react';
 import { downloadShareCard, copyToClipboard } from '@/lib/share';
 import ShareCard from './ShareCard';
 import { motion } from 'framer-motion';
@@ -17,12 +18,25 @@ export default function ResultCard({
   onReset: () => void;
 }) {
 
+  const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
   const handleCopyPost = () => {
     copyToClipboard(result.linkedinPost);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   };
 
-  const handleDownloadImage = () => {
-    downloadShareCard('share-card-node', `ai-risk-${userInput.jobTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`);
+  const handleShareLinkedIn = () => {
+    const postText = encodeURIComponent(result.linkedinPost);
+    const url = `https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Famireplaceablebyai.vercel.app&title=Am+I+Replaceable+By+AI%3F&summary=${postText}`;
+    window.open(url, '_blank', 'noopener,noreferrer,width=600,height=700');
+  };
+
+  const handleDownloadImage = async () => {
+    setDownloading(true);
+    await downloadShareCard('share-card-node', `ai-risk-${userInput.jobTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`);
+    setDownloading(false);
   };
 
   const getRiskIcon = () => {
@@ -211,21 +225,33 @@ export default function ResultCard({
           
           <div className="mt-10 pt-8 border-t border-gray-800">
             <h4 className="text-gray-400 text-sm font-medium mb-4 uppercase tracking-wider">Share your results</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button 
-                onClick={handleCopyPost}
+            <div className="grid grid-cols-1 gap-3">
+              <button
+                onClick={handleShareLinkedIn}
                 className="flex items-center justify-center gap-2 bg-[#0A66C2] hover:bg-[#004182] text-white py-3 px-4 rounded-xl font-medium transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-                Copy Post
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                </svg>
+                Share on LinkedIn
               </button>
-              <button 
-                onClick={handleDownloadImage}
-                className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-xl font-medium transition-colors border border-gray-700"
-              >
-                <Download className="w-5 h-5" />
-                Save Card
-              </button>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={handleCopyPost}
+                  className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-xl font-medium transition-colors border border-gray-700"
+                >
+                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                  {copied ? 'Copied!' : 'Copy Post'}
+                </button>
+                <button
+                  onClick={handleDownloadImage}
+                  disabled={downloading}
+                  className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-xl font-medium transition-colors border border-gray-700 disabled:opacity-50"
+                >
+                  <Download className="w-4 h-4" />
+                  {downloading ? 'Saving...' : 'Save Card'}
+                </button>
+              </div>
             </div>
             <button 
               onClick={onReset}
@@ -242,8 +268,8 @@ export default function ResultCard({
         {result.caveat || "This is not career, hiring, or employment advice. For educational and entertainment purposes only."}
       </div>
 
-      {/* Hidden Share Card purely for image generation */}
-      <div className="overflow-hidden h-0 w-0 absolute">
+      {/* Hidden Share Card purely for image generation - must be off-screen but not zero-sized */}
+      <div style={{ position: 'fixed', top: 0, left: '-9999px', pointerEvents: 'none', zIndex: -1 }}>
         <ShareCard result={result} userInput={userInput} />
       </div>
     </div>
