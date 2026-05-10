@@ -1,5 +1,7 @@
 # Am I Replaceable by AI?
 
+![App Screenshot](./public/screenshot.png)
+
 A viral, production-ready web application that calculates a user's AI automation exposure score based on their daily tasks. The app provides a score, personalized advice, a 30-day action plan, and a shareable LinkedIn card.
 
 ## Tech Stack
@@ -8,11 +10,11 @@ A viral, production-ready web application that calculates a user's AI automation
 - Tailwind CSS v4
 - Framer Motion (Animations)
 - Lucide React (Icons)
-- OpenAI API (for dynamic analysis)
+- NVIDIA API (Llama 3 models for dynamic analysis)
 - html-to-image (for shareable card generation)
 
 ## Features
-- **Smart Analysis**: Uses OpenAI (GPT-4o) for intelligent role analysis.
+- **Smart Analysis**: Uses NVIDIA API (Meta Llama 3) for intelligent role analysis.
 - **Graceful Degradation**: If no API key is provided, the app uses a deterministic fallback scoring algorithm to calculate a risk score.
 - **Viral Sharing**: Generates downloadable Open Graph-style PNG cards and pre-written LinkedIn posts.
 - **Sleek UI**: Built with a dark-mode-first, neon-accented aesthetic.

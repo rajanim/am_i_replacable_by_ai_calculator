@@ -56,6 +56,18 @@ export default function LoadingState() {
           </motion.p>
         </AnimatePresence>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 0.8 }}
+        className="mt-6 flex items-center gap-2 bg-gray-900/60 border border-gray-700/50 rounded-xl px-5 py-3 text-sm text-gray-400 max-w-sm text-center"
+      >
+        <span className="text-yellow-400 text-base">⏳</span>
+        <span>
+          This may take <span className="text-gray-200 font-medium">up to a minute</span> — we&apos;re running a free, open-source AI model hosted by NVIDIA.
+        </span>
+      </motion.div>
     </div>
   );
 }

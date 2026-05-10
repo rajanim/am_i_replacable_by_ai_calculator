@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { SUGGEST_TASKS_PROMPT } from '@/lib/prompts';
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -47,10 +49,13 @@ Seniority: ${body.seniority || 'Not specified'}`;
         temperature: 0.7,
       });
 
-      const responseContent = completion.choices[0].message.content;
+      let responseContent = completion.choices[0].message.content;
       if (!responseContent) {
         throw new Error('No content returned from NVIDIA API');
       }
+
+      // Strip markdown code block formatting if present
+      responseContent = responseContent.replace(/```json/g, '').replace(/```/g, '').trim();
 
       const parsedResult = JSON.parse(responseContent);
       return NextResponse.json(parsedResult);
